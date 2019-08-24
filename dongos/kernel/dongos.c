@@ -1,9 +1,25 @@
 #include "dongos.h"
 #include "dos_tasks.h"
+#include "list.h"
 
 static void dos_system_run(void)
 {
 	uint8 idx;
+	struct list_node *pos;
+	
+	list_for_each(pos, tasks_tcb_head) {
+		if (0 != ((dos_task_tcb_t *)pos)->event_set)
+		{
+			break;
+		}
+	}
+	
+	if (pos != tasks_tcb_head)
+	{
+		((dos_task_tcb_t *)pos)->process(0);
+	}
+	
+	return ;
 	
 	for (idx = 0; idx < tasks_cnt; idx++)
 	{

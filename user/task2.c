@@ -1,5 +1,6 @@
 #include "type_def.h"
 #include "dos_tasks.h"
+#include "list.h"
 
 extern uint8 flag;
 
@@ -18,3 +19,8 @@ dos_task_tcb_t dos_task2_tcb = {
 	.event_set = 0xffffffff,
 	.parameter = 0,
 };
+
+void task2_init(struct list_node *head)
+{
+	list_add(&dos_task2_tcb.dt_list, head);
+}

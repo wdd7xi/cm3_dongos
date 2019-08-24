@@ -1,7 +1,10 @@
 #include "type_def.h"
 #include "dos_tasks.h"
+#include "list.h"
 
 uint8 flag = 0;
+
+
 
 void task1_process_fn(void *parg)
 {
@@ -18,3 +21,8 @@ dos_task_tcb_t dos_task1_tcb = {
 	.event_set = 0xffffffff,
 	.parameter = 0,
 };
+
+void task1_init(struct list_node *head)
+{
+	list_add(&dos_task1_tcb.dt_list, head);
+}
