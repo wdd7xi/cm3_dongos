@@ -3,9 +3,14 @@
 
 #include "type_def.h"
 
+#define TASKS_PRIOTITY_MAX  32 
+
+
+extern struct list_node tasks_priority_tab[TASKS_PRIOTITY_MAX];
+
 extern dos_task_tcb_t * tasks_tcb_array[];
 extern const uint8 tasks_cnt;
-extern struct list_node *tasks_tcb_head;
+//extern struct list_node *tasks_tcb_head;
 
 
 void dos_tasks_init(void);

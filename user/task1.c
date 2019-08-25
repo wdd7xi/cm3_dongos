@@ -24,5 +24,5 @@ dos_task_tcb_t dos_task1_tcb = {
 
 void task1_init(struct list_node *head)
 {
-	list_add(&dos_task1_tcb.dt_list, head);
+	list_add(&(dos_task1_tcb.dt_list), &(tasks_priority_tab[1]));
 }
