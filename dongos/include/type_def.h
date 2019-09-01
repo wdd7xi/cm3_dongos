@@ -7,6 +7,17 @@ typedef  unsigned char    uint8;
 typedef  unsigned long     uint32;
 
 
+
+#define wd(x)      do { x } while (__LINE__ == -1)
+
+typedef long dos_int_state_t; /* 32bit CPU */ 
+#define ENTER_CRITICAL_SECTION(x)   wd( x = hw_interrupt_disable(); )
+#define EXIT_CRITICAL_SECTION(x)    wd( hw_interrupt_enable(x); )
+#define CRITICAL_STATEMENT(x)       wd( dos_int_state_t _s; ENTER_CRITICAL_SECTION(_s); x; EXIT_CRITICAL_SECTION(_s); )
+
+
+
+
 struct list_node 
 {
 	struct list_node *next, *prev;
@@ -19,6 +30,10 @@ typedef struct dos_task_tcb {
 	
 	task_handler_fn_t process; //encapsulation //
 	void * parameter;
+	
+	uint8 task_id;
+	uint8 priority;
+	uint32 priority_mask;
 	
 	void (*init)(void);
 	

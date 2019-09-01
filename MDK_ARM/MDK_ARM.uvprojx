@@ -411,6 +411,21 @@
               <FileType>1</FileType>
               <FilePath>..\user\dos_tasks.c</FilePath>
             </File>
+            <File>
+              <FileName>task0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\task0.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>dongos/cortex-m4</GroupName>
+          <Files>
+            <File>
+              <FileName>context_rvds.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\dongos\cortex-m4\context_rvds.S</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
