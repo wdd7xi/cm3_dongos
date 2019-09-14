@@ -386,6 +386,16 @@
               <FileType>1</FileType>
               <FilePath>..\dongos\kernel\dongos.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dongos\kernel\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>interrupts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dongos\kernel\interrupts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

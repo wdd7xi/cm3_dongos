@@ -4,6 +4,7 @@
 
 #include "type_def.h"
 
+#include "ARMCM3.h"
 
 
 const uint8 __lowest_bit_bitmap[] =
@@ -51,15 +52,23 @@ static void dos_system_run(void)
 	
 	dos_task_tcb_t *current_tcb;
 	
-	uint8 current_task_id;
-	uint8 current_priority;
+	//uint8 current_task_id;
+	//uint8 current_priority;
 	
 	uint32 current_event_set;
 	
 	ENTER_CRITICAL_SECTION(int_state);
+	
 	highest_ready_priority = __ffs(tasks_ready_priority_group) - 1;// - 1 ?
+	if (highest_ready_priority > TASKS_PRIOTITY_MAX)
+	{
+		
+		EXIT_CRITICAL_SECTION(int_state);
+		return ;
+	}
 	
 	tasks_tcb_head = &tasks_priority_tab[highest_ready_priority];
+	
 	EXIT_CRITICAL_SECTION(int_state);
 	
 	if (NULL == tasks_tcb_head)
@@ -74,19 +83,19 @@ static void dos_system_run(void)
 	list_for_each(pos, tasks_tcb_head) 
 	{
 		current_tcb = (dos_task_tcb_t *)pos;
-		current_task_id = current_tcb->task_id;
+		//current_task_id = current_tcb->task_id;
 		if (pos == NULL)
 		{
 			break;
 		}
-		current_priority = current_tcb->priority;
+		//current_priority = current_tcb->priority;
 		current_event_set = current_tcb->event_set;
 		
 		current_event_set = current_tcb->event_set;
 		if ((0 != current_event_set)
 		 && (NULL != current_tcb->process) )
 		{
-			current_tcb->process(0);
+			current_tcb->process(current_tcb);
 			//break;//continue  ?
 		}
 		
@@ -111,8 +120,12 @@ static void dos_system_run(void)
 	return ;
 }
 
+#define TICK_PER_SECOND       100
+
 void dos_system_init(void)
 {
+	SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
+	
 	dos_tasks_init();
 }
 

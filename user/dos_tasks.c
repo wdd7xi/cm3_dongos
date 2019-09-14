@@ -15,9 +15,9 @@ dos_task_tcb_t * tasks_tcb_array[TASKS_DRV_MAX_COUNT] = {0};
 
 
 
-uint8 dos_set_event( uint8 task_id, uint32 event_flag )
+uint8 dos_set_event(uint8 task_id, uint32 event_flag)
 {
-  if ( task_id < TASKS_DRV_MAX_COUNT )
+  if (task_id < TASKS_DRV_MAX_COUNT)
   {
 	dos_int_state_t int_state;
     ENTER_CRITICAL_SECTION(int_state);    // Hold off interrupts
@@ -32,7 +32,7 @@ uint8 dos_set_event( uint8 task_id, uint32 event_flag )
   }
 }
 
-uint8 dos_clear_event( uint8 task_id, uint32 event_flag )
+uint8 dos_clear_event(uint8 task_id, uint32 event_flag)
 {
   if ( task_id < TASKS_DRV_MAX_COUNT )
   {
@@ -88,10 +88,18 @@ void dos_tasks_init(void)
 	task2_init(0);
 	
 	#if 0
-	list_for_each(pos, tasks_tcb_head) {
+	list_for_each(pos, (struct list_node *)tasks_tcb_array[0]) {
 		if (NULL != ((dos_task_tcb_t *)pos)->init)
 		{
 			((dos_task_tcb_t *)pos)->init();
+		}
+	}
+	#else
+	for (i = 0; i < TASKS_DRV_MAX_COUNT; i++) 
+	{
+		if ((NULL != tasks_tcb_array[i]) && (NULL != tasks_tcb_array[i]->init))
+		{
+			tasks_tcb_array[i]->init();
 		}
 	}
 	#endif
