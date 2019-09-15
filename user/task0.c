@@ -8,10 +8,10 @@ dos_task_tcb_t dos_task0_tcb;
 
 struct timer timer0;
 
-static void task0_inside_init(void)
+static void inside_init(void)
 {
 
-	dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 2);
+	dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 4);
 }
 
 void task0_process_fn(void *parg)
@@ -33,7 +33,7 @@ void task0_process_fn(void *parg)
 	{
 		flag0 = 1;
 		
-		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x2, 2);
+		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x2, 4);
 		//dos_set_event(dos_task0_tcb.task_id, 0x2);
 		
 		dos_task0_tcb.event_set ^= 0x4; //NOK
@@ -44,7 +44,7 @@ void task0_process_fn(void *parg)
 	{
 		flag0 = 0;
 		
-		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 2);
+		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 3);
 		//dos_set_event(dos_task0_tcb.task_id, 0x4);
 		
 		dos_task0_tcb.event_set ^= 0x2; //OK
@@ -57,10 +57,14 @@ void task0_process_fn(void *parg)
 
 dos_task_tcb_t dos_task0_tcb = {
 	.process = task0_process_fn,
-	.priority = 0,
-	.init = task0_inside_init,
-	.event_set = 0,//0x4,
 	.parameter = 0,
+	
+	.priority = 0,
+	
+	.init_tick = 3,
+	
+	.init = inside_init,
+	.event_set = 0,//0x4,
 };
 
 void task0_init(struct list_node *head)

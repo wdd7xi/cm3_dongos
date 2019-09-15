@@ -4,6 +4,10 @@
 
 #include "list.h"
 
+#define DEFAULT_TICK  10 // Default
+
+extern dos_task_tcb_t *g_current_tcb;
+
 //LIST_NODE(tasks_tcb);
 //struct list_node *tasks_tcb_head = &tasks_tcb;
 
@@ -13,6 +17,15 @@ struct list_node tasks_priority_tab[TASKS_PRIOTITY_MAX];
 
 dos_task_tcb_t * tasks_tcb_array[TASKS_DRV_MAX_COUNT] = {0};
 
+void delay(uint32 count)
+{
+	for (; count != 0; count--);
+}
+
+dos_task_tcb_t * task_tcb_self(void)
+{
+	return g_current_tcb;
+}
 
 
 uint8 dos_set_event(uint8 task_id, uint32 event_flag)
@@ -58,8 +71,17 @@ int task_add(dos_task_tcb_t *tcb)
 		if (NULL == tasks_tcb_array[i]) 
 		{
 			tasks_tcb_array[i] = tcb;
+			
 			tcb->task_id = i;
+			
 			tcb->priority_mask = 1L << tcb->priority;
+			
+			if (0 == tcb->init_tick)
+			{
+				tcb->init_tick = DEFAULT_TICK;
+				tcb->remaining_tick = DEFAULT_TICK;
+			}
+			
 			list_add_tail((struct list_node *)tcb, &(tasks_priority_tab[tcb->priority]));
 			break;
 		}

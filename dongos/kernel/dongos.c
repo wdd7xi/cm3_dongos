@@ -6,6 +6,8 @@
 
 #include "ARMCM3.h"
 
+dos_task_tcb_t *g_current_tcb = NULL;
+
 
 const uint8 __lowest_bit_bitmap[] =
 {
@@ -77,6 +79,7 @@ static void dos_system_run(void)
 	}
 	if (list_empty_careful(tasks_tcb_head))
 	{
+		tasks_ready_priority_group &= ~(1<<highest_ready_priority);
 		return ;
 	}
 	
@@ -89,12 +92,13 @@ static void dos_system_run(void)
 			break;
 		}
 		//current_priority = current_tcb->priority;
-		current_event_set = current_tcb->event_set;
+		//current_event_set = current_tcb->event_set;
 		
 		current_event_set = current_tcb->event_set;
 		if ((0 != current_event_set)
 		 && (NULL != current_tcb->process) )
 		{
+			g_current_tcb = current_tcb;
 			current_tcb->process(current_tcb);
 			//break;//continue  ?
 		}

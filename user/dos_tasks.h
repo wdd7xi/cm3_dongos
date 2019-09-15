@@ -11,14 +11,18 @@
 typedef  void (*task_handler_fn_t)(void * parg);
 
 typedef struct dos_task_tcb {
-	struct list_node dt_list; //inherit //Doubly Task Linked List
+	struct list_node dt_node;//dt_list; //inherit //Doubly Task Linked List
 	
 	task_handler_fn_t process; //encapsulation //
 	void * parameter;
 	
 	uint8 task_id;
+	
 	uint8 priority;
 	uint32 priority_mask;
+	
+	uint32 init_tick;
+	uint32 remaining_tick;
 	
 	void (*init)(void);
 	
@@ -52,5 +56,7 @@ void task2_init(struct list_node *head);
 
 uint8 dos_set_event( uint8 task_id, uint32 event_flag );
 uint8 dos_clear_event( uint8 task_id, uint32 event_flag );
+dos_task_tcb_t * task_tcb_self(void);
+void delay(uint32 count);
 
 #endif

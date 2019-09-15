@@ -15,6 +15,7 @@ struct timer
 };
 
 
+
 uint8 dos_start_timer(struct timer * new_timer, uint8 taskID, uint32 event_id, uint32 timeout_value);
 uint8 dos_start_reload_timer(struct timer * new_timer, uint8 taskID, uint32 event_id, uint32 timeout_value);
 void tick_increase(void);

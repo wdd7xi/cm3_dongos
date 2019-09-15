@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "dos_tasks.h"
 
+
 static struct list_node gtimer_list_head;
 static LIST_NODE(gtimer_list_head);
 static struct list_node * pgtimer_list_head = &gtimer_list_head;
@@ -44,22 +45,37 @@ static struct timer *dos_find_timer(uint8 task_id, uint32 event_flag)
 
 static int zj_insert_sort_to_timer_list(struct timer *new)
 {
-	struct timer * current = (struct timer *)(pgtimer_list_head->next);
+	//struct list_node * pos = NULL;
+	struct timer * current = (struct timer *)&gtimer_list_head;//(pgtimer_list_head);
 	uint32 diff_tick = 0;
 	
-	for (;current != (struct timer *)(pgtimer_list_head->prev); current = (struct timer *)current->tnode.next)
+	//if (list_empty(pgtimer_list_head))
+	//{
+	//	goto add_node;
+	//}
+	//for (;current != (struct timer *)(pgtimer_list_head->prev); current = (struct timer *)current->tnode.next)
+	for (;current != (struct timer *)(gtimer_list_head.prev); current = (struct timer *)current->tnode.next)
+	//list_for_each(pos, pgtimer_list_head)
 	{
-		diff_tick = current->timeout_tick - new->timeout_tick;
+		struct timer * t = (struct timer *)current->tnode.next;
+		//current = (struct timer *)pos;
+		diff_tick = t->timeout_tick - new->timeout_tick;
 		if (0 == diff_tick)
 		{
 			continue;
 		}
 		else if (diff_tick < TICK_MAX / 2)
 		{
+			//current = (struct timer *)current->tnode.prev;
 			break;
 		}
+		else 
+		{
+			;
+		}
 	}
-	
+
+//add_node:
 	random_nr++;
 	
 	list_add((struct list_node *)new, (struct list_node *)current);
@@ -78,7 +94,7 @@ static uint8 dos_add_timer(struct timer * new_timer, uint8 taskID, uint32 event_
 		//find_timer->init_tick = timeout_value;
 		find_timer->timeout_tick = tick_get() + timeout_value;
 		//... todo del 
-		list_del((struct list_node *)find_timer);
+		list_del_init((struct list_node *)find_timer);
 		
 		zj_insert_sort_to_timer_list(find_timer);
 	}
@@ -87,6 +103,7 @@ static uint8 dos_add_timer(struct timer * new_timer, uint8 taskID, uint32 event_
 		new_timer->task_id = taskID;
 		new_timer->event_flag = event_id;
 		new_timer->timeout_tick = tick_get() + timeout_value;
+		INIT_LIST_NODE((struct list_node *)new_timer);
 		//... todo insert
 		zj_insert_sort_to_timer_list(new_timer);
 	}
@@ -132,13 +149,13 @@ static void timer_check(void)
 
 	current_tick = tick_get();
 	ENTER_CRITICAL_SECTION(int_state);
-	while (!list_empty(pgtimer_list_head))
+	while (!list_empty(&gtimer_list_head))
 	{
-		t = (struct timer *)(pgtimer_list_head->next);
+		t = (struct timer *)(gtimer_list_head.next);
 		
 		if ((current_tick - t->timeout_tick) < TICK_MAX / 2)
 		{
-			list_del((struct list_node *)t);
+			list_del_init((struct list_node *)t);
 			
 			dos_set_event(t->task_id, t->event_flag);
 			
@@ -152,10 +169,42 @@ static void timer_check(void)
 	EXIT_CRITICAL_SECTION(int_state);
 }
 
+int task_yield(void)
+{
+	dos_int_state_t int_state;
+	dos_task_tcb_t * tcb = task_tcb_self();
+	
+	ENTER_CRITICAL_SECTION(int_state);
+	
+	if (tcb->dt_node.next != tcb->dt_node.prev)
+	{
+		//list_del((struct list_node *)tcb);
+		list_move_tail((struct list_node *)tcb, pgtimer_list_head);
+	}
+	
+	EXIT_CRITICAL_SECTION(int_state);
+	
+	return 0;
+}
+
 void tick_increase(void)
 {
+	//dos_task_tcb_t * tcb;
+
 	++tick;
+#if 0
+	tcb = task_tcb_self();
+	if (NULL != tcb)
+	{
+		--tcb->remaining_tick;
+		if (0 == tcb->remaining_tick)
+		{
+			tcb->remaining_tick = tcb->init_tick;
+			task_yield();
+		}
+	}
+#endif
 	
-	timer_check();
+	timer_check();//pro 0-OK    1-NOK
 }
 

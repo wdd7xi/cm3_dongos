@@ -71,6 +71,17 @@ static inline void list_del_init(struct list_node *entry)
 	INIT_LIST_NODE(entry);
 }
 
+static inline void list_move(struct list_node *list, struct list_node *head)
+{
+	__list_del_entry(list);
+	list_add(list, head);
+}
+static inline void list_move_tail(struct list_node *list, struct list_node *head)
+{
+	__list_del_entry(list);
+	list_add_tail(list, head);
+}
+
 static inline int list_is_first(const struct list_node *list, const struct list_node *head)
 {
 	return list->prev == head;
