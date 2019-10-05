@@ -9,7 +9,8 @@
 #include "task0.h"
 
 static uint8 count = 0;
-static dos_task_tcb_t dos_task0_tcb;
+static uint8 is_continue = 1;
+dos_task_tcb_t dos_task0_tcb;
 #define ON_TIMES_MS    500
 
 
@@ -33,7 +34,7 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
 		
 		++count;
-		if (count > 3) 
+		if ((count > 2) || (0 == is_continue))
 		{
 			//dos_set_event(current_tcb->task_id, LED_EVT_STOP);
 			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_STOP, 10);
@@ -52,7 +53,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_BLUE_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_BLUE_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_GREEN_ON; 
 		return ;
@@ -63,7 +67,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_ORANGE_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_ORANGE_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_BLUE_ON; 
 		return ;
@@ -75,7 +82,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_CYAN_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_CYAN_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_ORANGE_ON; 
 		return ;
@@ -86,7 +96,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_PURPLE_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_PURPLE_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_CYAN_ON; 
 		return ;
@@ -97,7 +110,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_WHITE_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_WHITE_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_PURPLE_ON; 
 		return ;
@@ -109,7 +125,10 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_BLACK_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_BLACK_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_WHITE_ON; 
 		return ;
@@ -120,14 +139,44 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_RED_ON, ON_TIMES_MS);//500ms
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_RED_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_BLACK_ON; 
+		return ;
+	}
+	
+	if (current_tcb->event_set & LED_EVT_RED_TOGGLE)
+	{
+		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_7);//R	//PE7  
+		
+		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_8);//G	//PE8  
+		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_9);//B	//PE9  
+		
+		current_tcb->event_set ^= LED_EVT_RED_TOGGLE; 
+		return ;
+	}
+	if (current_tcb->event_set & LED_EVT_GREEN_TOGGLE)
+	{
+		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_8);//G	//PE8  
+		
+		current_tcb->event_set ^= LED_EVT_GREEN_TOGGLE; 
+		return ;
+	}
+	if (current_tcb->event_set & LED_EVT_BLUE_TOGGLE)
+	{
+		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_9);//B	//PE9  
+		
+		current_tcb->event_set ^= LED_EVT_BLUE_TOGGLE; 
 		return ;
 	}
 
 	if (current_tcb->event_set & LED_EVT_STOP)
 	{
+		is_continue = 0;
+		
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);//R	//PE7 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
@@ -140,7 +189,7 @@ static void task0_process_fn(void *parg)
 }
 
 
-static dos_task_tcb_t dos_task0_tcb = 
+dos_task_tcb_t dos_task0_tcb = 
 {
 	.process = task0_process_fn,
 	.parameter = 0,

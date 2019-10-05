@@ -8,7 +8,8 @@
 #include "task1.h"
 
 static uint8 count = 0;
-static dos_task_tcb_t dos_task1_tcb;
+static uint8 is_continue = 1;
+dos_task_tcb_t dos_task1_tcb;
 #define ON_TIMES_MS    500
 
 static struct timer timer1;
@@ -47,7 +48,7 @@ static void task1_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
 		
 		++count;
-		if (count > 3) 
+		if ((count > 3) || (0 == is_continue))
 		{
 			dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_STOP, 10);
 		}
@@ -63,14 +64,27 @@ static void task1_process_fn(void *parg)
 	{
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 		
-		dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_ON, ON_TIMES_MS);
+		if (1 == is_continue) 
+		{
+			dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_ON, ON_TIMES_MS);
+		}
 
 		current_tcb->event_set ^= BEEP_EVT_OFF;
 		return ;
 	}
 	
+	if (current_tcb->event_set & BEEP_EVT_TOGGLE)
+	{
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);//PB2
+		
+		current_tcb->event_set ^= BEEP_EVT_TOGGLE; 
+		return ;
+	}
+	
 	if (current_tcb->event_set & BEEP_EVT_STOP)
 	{
+		is_continue = 0;
+		
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 
 		current_tcb->event_set ^= BEEP_EVT_STOP;
@@ -81,7 +95,7 @@ static void task1_process_fn(void *parg)
 }
 
 
-static dos_task_tcb_t dos_task1_tcb = 
+dos_task_tcb_t dos_task1_tcb = 
 {
 	.process = task1_process_fn,
 	.parameter = 0,
