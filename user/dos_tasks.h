@@ -24,7 +24,7 @@ typedef struct dos_task_tcb {
 	uint32 init_tick;
 	uint32 remaining_tick;
 	
-	void (*init)(void);
+	void (*init)(void *parg);
 	
 	//uint32 (*task_fn)(void * arg);
 	uint32 event_set;

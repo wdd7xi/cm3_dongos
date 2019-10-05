@@ -125,7 +125,7 @@ void dos_tasks_init(void)
 	{
 		if ((NULL != tasks_tcb_array[i]) && (NULL != tasks_tcb_array[i]->init))
 		{
-			tasks_tcb_array[i]->init();
+			tasks_tcb_array[i]->init(tasks_tcb_array[i]);
 		}
 	}
 	#endif

@@ -4,20 +4,22 @@
 #include "timer.h"
 
 uint8 flag1 = 0;
-dos_task_tcb_t dos_task1_tcb;
+static dos_task_tcb_t dos_task1_tcb;
 
-struct timer timer1;
-static void inside_init(void)
+static struct timer timer1;
+static dos_task_tcb_t *current_tcb = NULL;
+
+static void inside_init(void *parg)
 {
-
-	dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x4, 2);
+	current_tcb = parg;
+	dos_start_timer(&timer1, current_tcb->task_id, 0x4, 2);
 }
 
-void task1_process_fn(void *parg)
+static void task1_process_fn(void *parg)
 {
 #if 0
 	flag1 = 1;
-	dos_task1_tcb.event_set = 0;
+	current_tcb->event_set = 0;
 	
 	//tasks_ready_priority_group |= 1 << dos_task2_tcb.priority;
 	//dos_task2_tcb.event_set = 0xffffffff;
@@ -28,27 +30,27 @@ void task1_process_fn(void *parg)
 	flag1 = 0;
 #else
 	
-	if ( dos_task1_tcb.event_set & 0x4 )
+	if ( current_tcb->event_set & 0x4 )
 	{
 		flag1 = 1;
 		
-		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x2, 200);
+		dos_start_timer(&timer1, current_tcb->task_id, 0x2, 200);
 		//delay(10);
-		//dos_set_event(dos_task1_tcb.task_id, 0x2);
+		//dos_set_event(current_tcb->task_id, 0x2);
 		
-		dos_task1_tcb.event_set ^= 0x4; //NOK
-		//dos_task1_tcb.event_set = 0;      //OK
+		current_tcb->event_set ^= 0x4; //NOK
+		//current_tcb->event_set = 0;      //OK
 		return ;
 	}
-	if ( dos_task1_tcb.event_set & 0x2 )
+	if ( current_tcb->event_set & 0x2 )
 	{
 		flag1 = 0;
 		
-		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x4, 200);
+		dos_start_timer(&timer1, current_tcb->task_id, 0x4, 200);
 		//delay(10);
-		//dos_set_event(dos_task1_tcb.task_id, 0x4);
+		//dos_set_event(current_tcb->task_id, 0x4);
 		
-		dos_task1_tcb.event_set ^= 0x2; //OK
+		current_tcb->event_set ^= 0x2; //OK
 		return ;
 	}
 #endif
@@ -56,7 +58,7 @@ void task1_process_fn(void *parg)
 }
 
 
-dos_task_tcb_t dos_task1_tcb = {
+static dos_task_tcb_t dos_task1_tcb = {
 	.process = task1_process_fn,
 	.parameter = 0,
 	
