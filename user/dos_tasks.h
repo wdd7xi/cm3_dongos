@@ -58,5 +58,6 @@ uint8 dos_set_event( uint8 task_id, uint32 event_flag );
 uint8 dos_clear_event( uint8 task_id, uint32 event_flag );
 dos_task_tcb_t * task_tcb_self(void);
 void delay(uint32 count);
+void Delay_sw(uint32 nCount);
 
 #endif

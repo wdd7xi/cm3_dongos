@@ -1,3 +1,6 @@
+#include "main.h"
+#include "stm32l4xx_hal.h"
+
 #include "type_def.h"
 #include "dos_tasks.h"
 #include "list.h"
@@ -5,6 +8,7 @@
 
 uint8 flag0;
 dos_task_tcb_t dos_task0_tcb;
+#define R_LED_FLASH
 
 struct timer timer0;
 
@@ -33,7 +37,17 @@ void task0_process_fn(void *parg)
 	{
 		flag0 = 1;
 		
-		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x2, 4);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
+#if defined(R_LED_FLASH)//LED OFF
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);//R 	//PE7 ??1
+#elif defined(G_LED_FLASH)
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G 	//PE8 ??1
+#elif defined(B_LED_FLASH)
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B 	//PE9 ??1
+#endif
+	//Delay_sw(0x7FFFFF);
+		
+		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x2, 500);//500ms
 		//dos_set_event(dos_task0_tcb.task_id, 0x2);
 		
 		dos_task0_tcb.event_set ^= 0x4; //NOK
@@ -43,8 +57,18 @@ void task0_process_fn(void *parg)
 	if ( dos_task0_tcb.event_set & 0x2 )
 	{
 		flag0 = 0;
+
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G 	//PE8 ??1
+#if defined(R_LED_FLASH)//LED ON
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);//R	//PE7 ??0
+#elif defined(G_LED_FLASH)
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);//G	//PE8 ??0
+#elif defined(B_LED_FLASH)
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//B	//PE9 ??0
+#endif
+	//Delay_sw(0x7FFFFF);
 		
-		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 3);
+		dos_start_timer(&timer0, dos_task0_tcb.task_id, 0x4, 500);//500ms
 		//dos_set_event(dos_task0_tcb.task_id, 0x4);
 		
 		dos_task0_tcb.event_set ^= 0x2; //OK

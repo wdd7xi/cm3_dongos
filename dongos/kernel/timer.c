@@ -9,7 +9,7 @@ static struct list_node * pgtimer_list_head = &gtimer_list_head;
 
 static uint32 tick = 0;
 
-#define TICK_MAX    100 
+#define TICK_MAX    420000//7*60*1000ms //100 
 uint32 random_nr;
 
 uint32 tick_get(void)

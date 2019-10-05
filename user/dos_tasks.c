@@ -21,6 +21,10 @@ void delay(uint32 count)
 {
 	for (; count != 0; count--);
 }
+void Delay_sw(uint32 nCount)
+{
+    while(nCount--) {};
+}
 
 dos_task_tcb_t * task_tcb_self(void)
 {

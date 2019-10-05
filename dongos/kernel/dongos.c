@@ -4,7 +4,7 @@
 
 #include "type_def.h"
 
-#include "ARMCM3.h"
+//#include "ARMCM3.h"
 
 dos_task_tcb_t *g_current_tcb = NULL;
 
@@ -128,7 +128,7 @@ static void dos_system_run(void)
 
 void dos_system_init(void)
 {
-	SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
+	//SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
 	
 	dos_tasks_init();
 }

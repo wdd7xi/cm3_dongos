@@ -32,7 +32,7 @@ void task1_process_fn(void *parg)
 	{
 		flag1 = 1;
 		
-		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x2, 2);
+		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x2, 200);
 		//delay(10);
 		//dos_set_event(dos_task1_tcb.task_id, 0x2);
 		
@@ -44,7 +44,7 @@ void task1_process_fn(void *parg)
 	{
 		flag1 = 0;
 		
-		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x4, 2);
+		dos_start_timer(&timer1, dos_task1_tcb.task_id, 0x4, 200);
 		//delay(10);
 		//dos_set_event(dos_task1_tcb.task_id, 0x4);
 		
