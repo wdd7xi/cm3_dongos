@@ -1,64 +1,88 @@
+#include "stm32l4xx_hal.h"
+
 #include "type_def.h"
 #include "dos_tasks.h"
 #include "list.h"
 #include "timer.h"
 
-uint8 flag1 = 0;
+#include "task1.h"
+
+static uint8 count = 0;
 static dos_task_tcb_t dos_task1_tcb;
+#define ON_TIMES_MS    500
 
 static struct timer timer1;
 static dos_task_tcb_t *current_tcb = NULL;
 
+
+void beep_init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+	
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	
+	//PB2
+	GPIO_InitStruct.Pin = GPIO_PIN_2;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+}
+
+
 static void inside_init(void *parg)
 {
 	current_tcb = parg;
-	dos_start_timer(&timer1, current_tcb->task_id, 0x4, 2);
+	dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_OFF, 2);
+	
+	beep_init();
 }
 
 static void task1_process_fn(void *parg)
 {
-#if 0
-	flag1 = 1;
-	current_tcb->event_set = 0;
-	
-	//tasks_ready_priority_group |= 1 << dos_task2_tcb.priority;
-	//dos_task2_tcb.event_set = 0xffffffff;
-	
-	dos_set_event( dos_task0_tcb.task_id, 0x1 );
-	//tasks_ready_priority_group |= 1 << dos_task0_tcb.priority;
-	//dos_task0_tcb.event_set = 0xffffffff;
-	flag1 = 0;
-#else
-	
-	if ( current_tcb->event_set & 0x4 )
+	if (current_tcb->event_set & BEEP_EVT_ON)
 	{
-		flag1 = 1;
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
 		
-		dos_start_timer(&timer1, current_tcb->task_id, 0x2, 200);
-		//delay(10);
-		//dos_set_event(current_tcb->task_id, 0x2);
-		
-		current_tcb->event_set ^= 0x4; //NOK
-		//current_tcb->event_set = 0;      //OK
+		++count;
+		if (count > 3) 
+		{
+			dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_STOP, 10);
+		}
+		else 
+		{
+			dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_OFF, ON_TIMES_MS);
+		}
+
+		current_tcb->event_set ^= BEEP_EVT_ON;
 		return ;
 	}
-	if ( current_tcb->event_set & 0x2 )
+	if (current_tcb->event_set & BEEP_EVT_OFF)
 	{
-		flag1 = 0;
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 		
-		dos_start_timer(&timer1, current_tcb->task_id, 0x4, 200);
-		//delay(10);
-		//dos_set_event(current_tcb->task_id, 0x4);
-		
-		current_tcb->event_set ^= 0x2; //OK
+		dos_start_timer(&timer1, current_tcb->task_id, BEEP_EVT_ON, ON_TIMES_MS);
+
+		current_tcb->event_set ^= BEEP_EVT_OFF;
 		return ;
 	}
-#endif
+	
+	if (current_tcb->event_set & BEEP_EVT_STOP)
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+
+		current_tcb->event_set ^= BEEP_EVT_STOP;
+		return ;
+	}
+
 	return ;
 }
 
 
-static dos_task_tcb_t dos_task1_tcb = {
+static dos_task_tcb_t dos_task1_tcb = 
+{
 	.process = task1_process_fn,
 	.parameter = 0,
 	

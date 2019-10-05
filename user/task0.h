@@ -15,6 +15,7 @@
 #define LED_EVT_BLACK_ON   0x00000100
 
 
+#define LED_EVT_STOP       0x10000000
 
 
 

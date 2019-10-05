@@ -79,8 +79,6 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-  /* Initialize the operating system */
-  dos_system_init();
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -107,6 +105,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  /* Initialize the operating system */
+  dos_system_init();
   /* Start dongos */
   dos_system_start();
 

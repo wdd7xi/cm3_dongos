@@ -1,4 +1,4 @@
-#include "main.h"
+//#include "main.h"
 #include "stm32l4xx_hal.h"
 
 #include "type_def.h"
@@ -8,9 +8,9 @@
 
 #include "task0.h"
 
-uint8 flag0;
+static uint8 count = 0;
 static dos_task_tcb_t dos_task0_tcb;
-#define ON_TIMES_MS    1000
+#define ON_TIMES_MS    500
 
 
 static struct timer timer0;
@@ -32,7 +32,16 @@ static void task0_process_fn(void *parg)
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
 		
-		dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_GREEN_ON, ON_TIMES_MS);//500ms
+		++count;
+		if (count > 3) 
+		{
+			//dos_set_event(current_tcb->task_id, LED_EVT_STOP);
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_STOP, 10);
+		}
+		else 
+		{
+			dos_start_timer(&timer0, current_tcb->task_id, LED_EVT_GREEN_ON, ON_TIMES_MS);//500ms
+		}
 		
 		current_tcb->event_set ^= LED_EVT_RED_ON; 
 		return ;
@@ -117,11 +126,22 @@ static void task0_process_fn(void *parg)
 		return ;
 	}
 
+	if (current_tcb->event_set & LED_EVT_STOP)
+	{
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);//R	//PE7 ??0
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);//G	//PE8 ??0
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);//B	//PE9 ??0
+		
+		current_tcb->event_set ^= LED_EVT_STOP; 
+		return ;
+	}
+
 	return ;
 }
 
 
-static dos_task_tcb_t dos_task0_tcb = {
+static dos_task_tcb_t dos_task0_tcb = 
+{
 	.process = task0_process_fn,
 	.parameter = 0,
 	
