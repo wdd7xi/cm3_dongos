@@ -76,7 +76,7 @@ uint8 key_scan(uint8 mode)
 uint8 read_key_state(void)
 {
 	//if (key_up == 7) 
-	{
+	//{
         if(KEY0 == 0)       return KEY0_PRES;
 
         else if(KEY1 == 0)  return KEY1_PRES;
@@ -84,7 +84,9 @@ uint8 read_key_state(void)
         else if(KEY2 == 0)  return KEY2_PRES;
 
         else if(WK_UP == 1) return WK_UP_PRES;
-	}
+	
+	return 0;
+	//}
 }
 
 
@@ -102,19 +104,24 @@ static void task2_process_fn(void *parg)
 	{
 		if (7 == key_scan(0))
 		{
+			printf("[%s %d] \r\n", __func__, __LINE__);
 			key_up = 0;
 			++count;
+			
+			if (0 == count%2)
+			{
+				printf("[%s %d] \r\n", __func__, __LINE__);
+				dos_start_timer(&timer2, current_tcb->task_id, KEY_EVT_READ_STATE, 10);
+			}
 		}
-		if (0 == count%2)
-			dos_start_timer(&timer2, current_tcb->task_id, KEY_EVT_READ_STATE, 10);
-		else
-			dos_start_timer(&timer2, current_tcb->task_id, KEY_EVT_PERIOD_SCAN, 10);
+		dos_start_timer(&timer2, current_tcb->task_id, KEY_EVT_PERIOD_SCAN, 10);
 		
 		current_tcb->event_set ^= KEY_EVT_PERIOD_SCAN;
 		return ;
 	}
 	if (current_tcb->event_set & KEY_EVT_READ_STATE)
 	{
+		printf("[%s %d] \r\n", __func__, __LINE__);
 		key = read_key_state();
 		switch (key)
         {

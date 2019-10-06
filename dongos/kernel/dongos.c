@@ -2,6 +2,8 @@
 #include "dos_tasks.h"
 #include "list.h"
 
+#include "usart.h"
+
 #include "type_def.h"
 
 //#include "ARMCM3.h"
@@ -131,6 +133,8 @@ void dos_system_init(void)
 	//SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
 	
 	dos_tasks_init();
+	
+	uart_init(115200); //Initialize serial port with baud rate of 115200.//Support printf
 }
 
 void dos_system_start(void)

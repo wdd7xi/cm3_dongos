@@ -128,7 +128,7 @@ int main(void)
   /* USER CODE END 3 */
 
 }
-
+#if 0 // SYSTEM/sys/sys.c
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -187,7 +187,7 @@ void SystemClock_Config(void)
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
-
+#endif
 /** Configure pins as 
         * Analog 
         * Input 

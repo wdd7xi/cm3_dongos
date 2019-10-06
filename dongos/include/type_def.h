@@ -1,7 +1,9 @@
 #ifndef __TYPE_DEF_H__
 #define __TYPE_DEF_H__
 
-#define  NULL  (0) 
+#include "stdio.h"
+//#define  NULL  (0) 
+
 typedef  unsigned char    uint8;
 //typedef  unsigned int     uint32;
 typedef  unsigned long     uint32;
