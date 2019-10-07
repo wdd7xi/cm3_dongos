@@ -1,6 +1,7 @@
 #include "dongos.h"
 #include "dos_tasks.h"
 #include "list.h"
+#include "memory.h"
 
 #include "usart.h"
 
@@ -127,14 +128,46 @@ static void dos_system_run(void)
 }
 
 #define TICK_PER_SECOND       100
-
+#if 0
+uint32 * tasksEvents;
+uint32 * tasksEvents2;
+uint32 * tasksEvents3;
+uint32 * tasksEvents4;
+uint32 * tasksEvents5;
+uint32 * tasksEvents6;
+#endif
 void dos_system_init(void)
 {
-	//SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
-	
-	dos_tasks_init();
-	
 	uart_init(115200); //Initialize serial port with baud rate of 115200.//Support printf
+	//SysTick_Config( SystemCoreClock / TICK_PER_SECOND );
+	mem_init();
+
+	dos_tasks_init();
+#if 0
+	tasksEvents = (uint32 *)mem_alloc( sizeof( uint32 ) * 1);
+	tasksEvents2 = (uint32 *)mem_alloc( sizeof( uint32 ) * 5);
+	tasksEvents3 = (uint32 *)mem_alloc( sizeof( uint8 ) * 5);
+	mem_free(tasksEvents2);
+	tasksEvents4 = (uint32 *)mem_alloc( sizeof( uint8 ) * 3200);
+	tasksEvents5 = (uint32 *)mem_alloc( sizeof( uint8 ) * 5000);
+	tasksEvents6 = (uint32 *)mem_alloc( sizeof( uint8 ) * 9);
+	
+	extern memhdr_t theHeap[];
+	printf("[%s %d]theHeap:0x%x \r\n", __func__, __LINE__, (uint32)theHeap);
+	printf("[%s %d]tasksEvents:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents, GET_ALLOC_LEN(tasksEvents), GET_ALLOC_INUSE(tasksEvents), GET_ALLOC_MAGIC(tasksEvents));
+	printf("[%s %d]tasksEvents2:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents2, GET_ALLOC_LEN(tasksEvents2), GET_ALLOC_INUSE(tasksEvents2), GET_ALLOC_MAGIC(tasksEvents2));
+	printf("[%s %d]tasksEvents3:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents3, GET_ALLOC_LEN(tasksEvents3), GET_ALLOC_INUSE(tasksEvents3), GET_ALLOC_MAGIC(tasksEvents3));
+	printf("[%s %d]tasksEvents4:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents4, GET_ALLOC_LEN(tasksEvents4), GET_ALLOC_INUSE(tasksEvents4), GET_ALLOC_MAGIC(tasksEvents4));
+
+	printf("[%s %d]tasksEvents5:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents5, GET_ALLOC_LEN(tasksEvents5), GET_ALLOC_INUSE(tasksEvents5), GET_ALLOC_MAGIC(tasksEvents5));
+	printf("[%s %d]tasksEvents6:0x%x len:%d inUse:%d magic:0x%x \r\n", __func__, __LINE__, 
+			(uint32)tasksEvents6, GET_ALLOC_LEN(tasksEvents6), GET_ALLOC_INUSE(tasksEvents6), GET_ALLOC_MAGIC(tasksEvents6));
+#endif
 }
 
 void dos_system_start(void)
